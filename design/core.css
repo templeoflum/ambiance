@@ -1,0 +1,263 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   AMB · 02 — shared material tokens
+   These are "reference grade" surface materials the studies stand on.
+   Each study sets --material-* via data-study; the shared components read from
+   them so the SAME component reads differently per material (same shape, diff skin).
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root{
+  /* shared */
+  --desk:#0a0908;
+  --desk-2:#060504;
+  --ink:#e9e2d6;
+  --ink-dim:#8a8073;
+  --ink-faint:#4a4339;
+  --pilot:#ffb347;            /* the resting pilot glow color */
+  --ease-critical:cubic-bezier(.16,1,.3,1);
+  --ease-snap:cubic-bezier(.34,1.56,.64,1);
+  --f-mono:'IBM Plex Mono','SF Mono','Menlo',monospace;
+  --f-cond:'Archivo Narrow','Oswald','Helvetica Neue',sans-serif;
+  --f-serif:'Newsreader','Georgia',serif;
+
+  /* material defaults (warm anodised / wood — the AMB·02 base) */
+  --mat-body-a:#2a2320;
+  --mat-body-b:#191410;
+  --mat-edge:#05030a;
+  --mat-panel:#1b1613;
+  --mat-metal-a:#3b3330;
+  --mat-metal-b:#0f0c0a;
+  --mat-metal-hi:#6b5f55;
+  --mat-acc:#ffb347;          /* emitted light: amber */
+  --mat-acc-soft:#ff8a3d;
+  --mat-dial-glow:rgba(255,160,60,.55);
+  --mat-metal-2:#5a5148;      /* secondary metal tone */
+  --mat-grain:.035;           /* texture amount */
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  background:radial-gradient(120% 120% at 50% 18%, var(--desk) 0%, var(--desk-2) 70%);
+  color:var(--ink);
+  font-family:var(--f-mono);
+  -webkit-font-smoothing:antialiased;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  min-height:100dvh; padding:28px; gap:30px;
+  overflow:hidden; user-select:none;
+}
+
+/* material grain — a thin directional streak + fine noise so surfaces don't read flat */
+.grain{
+  position:relative;
+  background-image:
+     repeating-linear-gradient(115deg, rgba(255,255,255,calc(var(--mat-grain) + .005)) 0 1px, transparent 1px 3px),
+     repeating-linear-gradient(-35deg, rgba(0,0,0,.06) 0 1px, transparent 1px 4px);
+  background-blend-mode:overlay,normal;
+}
+
+/* ═══════ STUDY SWITCHER (only in index/studies, not the live device) ═══════ */
+.studyswitch{
+  position:fixed; top:14px; left:16px; z-index:50;
+  font-family:var(--f-mono); font-size:10px; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--ink-faint);
+}
+.studyswitch b{color:var(--mat-acc);font-weight:500;}
+.lodbar{
+  position:fixed; bottom:16px; left:50%; transform:translateX(-50%); z-index:50;
+  display:flex; align-items:center; gap:10px;
+  font-family:var(--f-mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--ink-dim);
+}
+.lodbar .track{width:160px;height:3px;background:#1c1815;border-radius:2px;overflow:hidden;}
+.lodbar .fill{height:100%;background:linear-gradient(90deg,var(--mat-acc-soft),var(--mat-acc));width:34%;transition:width .25s var(--ease-critical);}
+.lodbar button{
+  background:none;border:1px solid #231e1a;color:var(--ink-dim);font:inherit;font-size:10px;
+  padding:4px 9px;border-radius:3px;cursor:pointer;letter-spacing:.14em;transition:.2s;
+}
+.lodbar button:hover{color:var(--ink);border-color:#3a332d;}
+.hint{font-family:var(--f-mono);font-size:10px;letter-spacing:.14em;color:var(--ink-faint);text-transform:uppercase;text-align:center;}
+
+/* ═══════ THE DEVICE (cabinet body) ═══════ */
+.device-wrap{display:flex;flex-direction:column;align-items:center;gap:22px;}
+
+/* cabinet: the physical object */
+.cabinet{
+  position:relative;
+  background:
+     linear-gradient(150deg, var(--mat-body-a) 0%, var(--mat-body-b) 55%, var(--mat-edge) 120%);
+  border-radius:14px;
+  border:1px solid #030203;
+  box-shadow:
+     0 1px 0 rgba(255,255,255,.05) inset,
+     0 -30px 50px rgba(0,0,0,.5) inset,
+     0 30px 60px -12px rgba(0,0,0,.85),
+     0 6px 18px rgba(0,0,0,.6);
+  padding:22px 24px;
+  transition:transform .5s var(--ease-critical), box-shadow .5s;
+}
+/* subtle raised bevel top edge */
+.cabinet::before{
+  content:"";position:absolute;inset:0;border-radius:14px;pointer-events:none;
+  background:linear-gradient(180deg, rgba(255,255,255,.06), transparent 22%);
+}
+
+/* ═══════ KNOB — physical, grab-to-turn ═══════ */
+.knob{
+  position:relative;
+  width:62px;height:62px;border-radius:50%;flex:0 0 auto;
+  cursor:grab;touch-action:none;
+  /* faceted/metalled look */
+  background:
+     radial-gradient(circle at 38% 32%, var(--mat-metal-hi) 0%, var(--mat-metal-a) 34%, var(--mat-metal-b) 72%, #000 100%);
+  box-shadow:
+     0 2px 0 var(--mat-metal-2) inset,
+     0 -3px 6px rgba(0,0,0,.7) inset,
+     0 6px 12px rgba(0,0,0,.6);
+  transition:transform .12s var(--ease-snap),box-shadow .2s;
+  /* knurling ring built from conic gradient so it reads as machined */
+}
+.knob::before{  /* knurl texture ring */
+  content:"";position:absolute;inset:-4px;border-radius:50%;
+  background:conic-gradient(from 0deg,
+     rgba(0,0,0,.55) 0 2deg, transparent 2deg 6deg,
+     var(--mat-metal-hi) 6deg 7deg, transparent 7deg 9deg);
+  opacity:.5;pointer-events:none;
+  mask:radial-gradient(circle, transparent 62%, black 63%);
+}
+.knob .idx{ /* the index pointer line */
+  position:absolute;top:7px;left:50%;width:2.5px;height:22px;margin-left:-1.25px;
+  background:linear-gradient(var(--mat-acc),transparent);
+  border-radius:2px;transform-origin:50% 24px;transform:rotate(0deg);
+  box-shadow:0 0 6px var(--mat-acc);pointer-events:none;
+  transition:opacity .3s;
+}
+.knob .cap{ /* center cap with a subtle screw / dot */
+  position:absolute;inset:24%;border-radius:50%;
+  background:radial-gradient(circle at 40% 35%, #2f2924, #100d0b);
+  border:1px solid #000;
+  box-shadow:0 1px 2px rgba(0,0,0,.6) inset, 0 1px 0 rgba(255,255,255,.05);
+}
+.knob .cap::after{ /* screw cross */
+  content:"";position:absolute;top:45%;left:18%;width:64%;height:1.5px;background:rgba(0,0,0,.7);border-radius:1px;
+}
+.knob.grab{cursor:grabbing;}
+.knob.press{transform:scale(.985);}
+.knob .val{
+  position:absolute;top:52%;left:50%;transform:translate(-50%,0);
+  font-size:8px;letter-spacing:.1em;color:var(--ink-dim);white-space:nowrap;opacity:0;transition:opacity .3s;
+}
+/* detent "click" flash */
+.knob.detent-flash{animation:detent .22s var(--ease-snap);}
+@keyframes detent{0%{filter:brightness(1)}30%{filter:brightness(1.8)}100%{filter:brightness(1)}}
+
+/* ═══════ BUTTON — presses ═══════ */
+.button{
+  position:relative;flex:0 0 auto;
+  background:linear-gradient(180deg,var(--mat-metal-a),var(--mat-metal-b));
+  border:1px solid #000;border-radius:5px;
+  box-shadow:0 3px 0 var(--mat-metal-2),0 5px 8px rgba(0,0,0,.5),0 1px 0 rgba(255,255,255,.06) inset;
+  color:var(--ink-dim);font-family:var(--f-mono);
+  transition:transform .06s var(--ease-snap),box-shadow .06s,filter .15s;
+  cursor:pointer;
+}
+.button.down{transform:translateY(3px);box-shadow:0 0 0 var(--mat-metal-2),0 1px 2px rgba(0,0,0,.5) inset;}
+.button.on{color:var(--mat-acc);text-shadow:0 0 8px var(--mat-acc);}
+
+/* ═══════ VU METER — needle with weight ═══════ */
+.vu{
+  position:relative;width:100%;height:34px;
+  background:linear-gradient(180deg,#15100b,#080503);
+  border-radius:4px;border:1px solid #000;overflow:hidden;
+  box-shadow:0 1px 2px rgba(255,255,255,.04) inset,0 2px 4px rgba(0,0,0,.6) inset;
+  display:flex;align-items:flex-end;padding:4px 6px;
+  opacity:.16;transition:opacity .5s;   /* low LOD = dim */
+}
+.vu .scale{position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(90deg,transparent 0 calc(10% - 1px),rgba(255,255,255,.05) calc(10% - 1px) 10%);}
+.vu .scale-red{position:absolute;right:0;top:0;bottom:0;width:22%;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(255,60,60,.18));}
+.vu .needle{
+  position:absolute;bottom:2px;left:2px;width:2px;height:90%;
+  background:linear-gradient(0deg,var(--mat-acc),rgba(255,180,80,.2));
+  transform-origin:bottom left;transform:rotate(0deg);
+  box-shadow:0 0 6px var(--mat-acc);
+  transition:transform .08s linear;
+}
+.vu .needle-shadow{
+  position:absolute;bottom:2px;left:2px;width:9px;height:90%;pointer-events:none;
+  background:linear-gradient(90deg,rgba(255,180,80,.12),transparent);
+  transform-origin:bottom left;transform:rotate(0deg);
+}
+.vu .glow{position:absolute;inset:0;background:radial-gradient(120% 90% at 20% 100%, var(--mat-dial-glow),transparent 60%);opacity:.35;}
+
+/* ═══════ ILLUMINATED DIAL (the screen IS the dial — archetype 1 idea) ═══════ */
+.dial{
+  position:relative;width:100%;height:96px;border-radius:6px;overflow:hidden;
+  background:linear-gradient(180deg,#1a130c,#0a0705 80%);
+  border:1px solid #000;
+  box-shadow:0 2px 8px rgba(0,0,0,.7) inset,0 1px 0 rgba(255,255,255,.03) inset,
+     0 0 22px var(--mat-dial-glow);
+}
+.dial .glass{position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.07),transparent 40%);pointer-events:none;}
+.dial .ticks{position:absolute;inset:0;background:
+     repeating-linear-gradient(90deg,transparent 0 calc(3.5% - 1px),rgba(255,190,110,.25) calc(3.5% - 1px) calc(3.5%));
+     height:16px;top:50%;transform:translateY(-50%);opacity:.6;}
+.dial .pointer{  /* the sweeping red/amber pointer */
+  position:absolute;top:0;bottom:0;left:10%;width:2px;
+  background:linear-gradient(var(--mat-acc-soft),rgba(255,120,50,.3));
+  box-shadow:0 0 10px var(--mat-acc-soft),0 0 3px var(--mat-acc-soft);
+  transition:left .45s var(--ease-critical);
+}
+.dial .pointer::before{content:"";position:absolute;top:-3px;left:-3px;width:8px;height:8px;border-radius:50%;
+  background:var(--mat-acc);box-shadow:0 0 10px var(--mat-acc);}
+.dial .now{position:absolute;left:8px;bottom:6px;font-size:9px;letter-spacing:.14em;color:var(--mat-acc);text-shadow:0 0 8px var(--mat-dial-glow);text-transform:uppercase;}
+.dial .sub{position:absolute;left:8px;bottom:16px;font-size:7px;letter-spacing:.18em;color:var(--ink-dim);text-transform:uppercase;}
+.dial .freq-label{position:absolute;right:6px;top:6px;font-size:8px;color:var(--mat-acc-soft);letter-spacing:.1em;}
+
+/* ═══════ small type labels ═══════ */
+.label{font-family:var(--f-mono);font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint);}
+.brand{font-family:var(--f-cond);font-weight:600;letter-spacing:.12em;}
+
+/* pilot glow dot (the quiet "alive but idle" signal) */
+.pilot{width:6px;height:6px;border-radius:50%;background:var(--mat-acc);
+  box-shadow:0 0 8px var(--mat-acc),0 0 16px var(--mat-acc);
+  animation:pulse 3.2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:.35}50%{opacity:1}}
+
+/* ═══════ MATERIAL PRESETS ═══════ */
+[data-study="cabinet"]{
+  --mat-body-a:#3a2b1d;--mat-body-b:#221811;--mat-edge:#0a0603;--mat-panel:#2b2016;
+  --mat-metal-a:#8a6a45;--mat-metal-b:#241a10;--mat-metal-hi:#c9a06a;
+  --mat-acc:#ffb04a;--mat-acc-soft:#ff8a34;--mat-dial-glow:rgba(255,170,70,.5);--mat-grain:.05;
+}
+[data-study="instrument"]{
+  --mat-body-a:#1a1d20;--mat-body-b:#0c0e10;--mat-edge:#000;--mat-panel:#141618;
+  --mat-metal-a:#6a7178;--mat-metal-b:#1a1e22;--mat-metal-hi:#a7b0b7;
+  --mat-acc:#ff2d2d;--mat-acc-soft:#ff5a3d;--mat-dial-glow:rgba(255,60,50,.45);--mat-grain:.02;
+  --f-mono:'IBM Plex Mono',monospace;
+}
+[data-study="furniture"]{
+  --mat-body-a:#23262a;--mat-body-b:#141619;--mat-edge:#08090b;--mat-panel:#1c1f23;
+  --mat-metal-a:#9aa0a6;--mat-metal-b:#33373c;--mat-metal-hi:#d7dbdf;
+  --mat-acc:#cfe8ff;--mat-acc-soft:#8fb8e0;--mat-dial-glow:rgba(150,200,255,.22);--mat-grain:.015;
+  --f-mono:'Helvetica Neue',sans-serif;--f-cond:'Helvetica Neue',sans-serif;
+}
+[data-study="amb"]{
+  --mat-acc:#ffb347;--mat-acc-soft:#ff8a3d;--mat-dial-glow:rgba(255,160,60,.5);
+}
+
+/* LOD reveal: at rest detail is faint; LOD2 blooms */
+body[data-lod="0"] .dial,body[data-lod="0"] .vu{opacity:.12;}
+body[data-lod="0"] .label,body[data-lod="0"] .val,body[data-lod="0"] .knob .idx{opacity:.12;}
+body[data-lod="0"] .cabinet{transform:scale(.94);}
+body[data-lod="1"] .dial,body[data-lod="1"] .vu{opacity:.35;}
+body[data-lod="1"] .label{opacity:.4;}
+body[data-lod="1"] .knob .idx{opacity:.4;}
+body[data-lod="2"] .dial{opacity:1;}
+body[data-lod="2"] .vu{opacity:.55;}
+body[data-lod="2"] .label,body[data-lod="2"] .val{opacity:1;}
+body[data-lod="2"] .knob .idx{opacity:1;}
+body[data-lod="2"] .cabinet{transform:scale(1);}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important;}
+}

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AMB · Radio</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="cabinet" id="cabinet">
+
+  <!-- Brand -->
+  <div class="brand">AMB<span class="brand-dot">·</span>01</div>
+
+  <!-- Display -->
+  <div class="display" id="display">
+    <div class="onair" id="onair">
+      <span class="dot" id="onair-dot"></span>
+      <span id="onair-label">OFF</span>
+    </div>
+    <div class="station" id="station-name">—</div>
+    <div class="station-sub" id="station-sub"></div>
+    <div class="freq-row">
+      <span class="freq" id="freq">--.- FM</span>
+      <span class="timer" id="timer">0:00</span>
+    </div>
+    <div class="eq">
+      <span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <!-- Panel of controls -->
+  <div class="panel">
+
+    <!-- Power -->
+    <div class="ctl power-ctl">
+      <div class="knob power" id="btn-power" role="button" tabindex="0"
+           aria-label="Power" title="Power on/off"></div>
+      <span class="ctl-label" id="power-label">OFF</span>
+    </div>
+
+    <!-- Tune -->
+    <div class="ctl tune-ctl">
+      <div class="tune-group">
+        <div class="knob small" id="btn-prev" role="button" tabindex="0"
+             aria-label="Previous channel">◀</div>
+        <div class="channel-num" id="channel-num">CH 0</div>
+        <div class="knob small" id="btn-next" role="button" tabindex="0"
+             aria-label="Next channel">▶</div>
+      </div>
+      <span class="ctl-label">TUNE</span>
+    </div>
+
+    <!-- Volume -->
+    <div class="ctl vol-ctl">
+      <div class="vol-dial" id="vol-dial" role="slider"
+           aria-label="Volume" aria-valuemin="0" aria-valuemax="100" aria-valuenow="65">
+        <div class="vol-track">
+          <div class="vol-fill" id="vol-fill"></div>
+          <div class="vol-knob" id="vol-knob"></div>
+        </div>
+      </div>
+      <span class="ctl-label">VOL</span>
+    </div>
+
+    <!-- Mute -->
+    <div class="ctl mute-ctl">
+      <div class="knob mute" id="btn-mute" role="button" tabindex="0"
+           aria-label="Mute" title="Mute / unmute"></div>
+      <span class="ctl-label" id="mute-label">—</span>
+    </div>
+
+    <!-- Quit -->
+    <div class="ctl quit-ctl">
+      <div class="knob quit" id="btn-quit" role="button" tabindex="0"
+           aria-label="Quit app" title="Quit app">⏻</div>
+      <span class="ctl-label">QUIT</span>
+    </div>
+
+  </div>
+
+  <!-- Drag strip along top edge -->
+  <div class="drag-strip no-interactive"></div>
+
+</div>
+
+<audio id="audio" preload="metadata"></audio>
+
+<script src="radio.js"></script>

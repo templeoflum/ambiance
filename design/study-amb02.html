@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AMB · 02 — study v4</title>
+<style>
+/* no text selection / callout anywhere (fixes drag-highlighting text) */
+html,body,*{ -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
+
+:root{
+    --desk:#0a0806; --ink:#e9e2d6; --ink-dim:#8a8073; --ink-faint:#4a4339;
+    --body-a:#3a2b1d; --body-b:#1d150e; --edge:#0a0603;
+    --metal-a:#8a6a45; --metal-b:#241a10; --metal-hi:#c9a06a;
+    --acc:#ffb04a; --acc-soft:#ff8a34; --glow:rgba(255,170,70,.5);
+    --ease-crit:cubic-bezier(.16,1,.3,1); --ease-snap:cubic-bezier(.34,1.56,.64,1);
+    --mono:'SF Mono','Menlo','IBM Plex Mono',monospace;
+    --cond:'Helvetica Neue',Arial,sans-serif;
+    --trayN:116px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+    background:radial-gradient(120% 120% at 50% 16%, var(--desk) 0%, #050403 72%);
+    font-family:var(--mono); color:var(--ink);
+    display:flex;align-items:center;justify-content:center;min-height:100dvh;overflow:hidden;
+}
+.tag{position:fixed;top:16px;left:50%;transform:translateX(-50%);text-align:center;
+    font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-faint);line-height:1.9;}
+.device{position:relative; width:300px; height:200px; }
+.sknob{position:absolute; width:60px; height:60px; background:var(--metal-a);
+    border:2px solid var(--metal-b); border-radius:50%; cursor:pointer;
+    transition: transform .1s ease; }
+.sknob .idx{position:absolute; inset:50% auto auto 50%; transform:rotate(-135deg)
+    translate(0,-30%); transition: opacity .2s; opacity:0; }
+.sknob.latched .idx{ opacity:1; }
+.nsh{position:absolute; bottom:1px; left:1px; width:7px; height:90%; pointer-events:none;
+    background:linear-gradient(90deg,rgba(255,180,90,.12),transparent); transform-origin:bottom; transform:rotate(-80deg);}
+/* ── cursor-lock mechanism ────────────────────────────────────────────── */
+let latched=null, lastX=null, lastY=null;      // frozen cursor screen coords
+
+function releaseCursor(){
+    if(!latched) return;
+    latched=null; lastX=null; lastY=null;
+    document.documentElement.style.cursor='';
+}
+function setFrozenCursor(e){
+    document.documentElement.style.cursor='none';
+    lastX=e.clientX; lastY=e.clientY;
+}
+window.addEventListener('pointerdown',e=>{
+    if(e.target.closest && e.target.closest('.grip')) return;   // tray drag
+    if(latched){ releaseCursor(); return; }                       // any click releases
+    const knob=e.target.closest ? e.target.closest('.knob') : null;
+    if(knob){ setFrozenCursor(e); latched=knob; knob.classList.add('latched'); }
+},{passive:false});
+window.addEventListener('pointermove',e=>{
+    if(!latched) return;
+    const dx=e.clientX-lastX, dy=e.clientY-lastY;
+    lastX=e.clientX; lastY=e.clientY;
+    const d=-(dx+dy)*0.0018;   // trackpad → turn
+    const k=document.querySelector('.knob.latched');
+    if(k===document.getElementById('kTune')){
+        const v=Math.max(0,Math.min(1, tuneValue+d)); // simplified
+        tuneValue=v;
+    } else {
+        const v=Math.max(0,Math.min(1, volValue+d));
+        volValue=v;
+    }
+},{passive:false});
+window.addEventListener('pointerup',e=>{
+    if(latched) releaseCursor();
+},{passive:false});
+
+/* ── knobs ──────────────────────────────────────────────────────────── */
+let tuneValue=0, volValue=0.65;
+const kTune=document.getElementById('kTune'), kVol=document.getElementById('kVol');
+kTune.addEventListener('pointerdown',e=>setFrozenCursor(e));
+kVol.addEventListener('pointerdown',e=>setFrozenCursor(e));
+</style>
+</head>
+<body>
+<div class="tag"><b>AMB · 02</b> — study v4 · cursor freeze demo</div>
+<div class="device" id="dev">
+    <div class="sknob" id="kTune" title="Tune knob"></div>
+    <div class="sknob" id="kVol" title="Vol knob"></div>
+    <div class="nsh"></div>
+</div>
+</body>
+</html>

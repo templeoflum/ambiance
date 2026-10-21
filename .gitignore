@@ -1,0 +1,24 @@
+.scratch/
+**/chrome*/
+**/profile/
+node_modules/
+.venv/
+venv/
+.env
+.env.*
+*.pem
+.DS_Store
+__pycache__/
+*.mov
+*.mp4
+*.wav
+*.aif
+*.aiff
+*.zip
+*.f3d
+*.tflite
+*.psd
+*.aep
+*.blend
+/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Electron Framework
+/_screen.png

@@ -1,0 +1,13 @@
+{
+  "name": "ambiance",
+  "version": "0.1.0",
+  "description": "Embodied ambient radio (and later TV) as furniture windows on the macOS desktop",
+  "main": "main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^43.4.0"
+  }
+}

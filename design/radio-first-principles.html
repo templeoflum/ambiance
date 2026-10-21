@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AMB · 02 — first principles</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+    background:radial-gradient(120%120% at50%16%, #0a0806 0%, #050403 72%);
+    color:#e9e2d6;
+    font-family:system-ui,-apple-system,Segoe UI,Helvetica,Arial,sans-serif;
+    display:flex;align-items:center;justify-content:center;
+    user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
+}
+#desk{width:min(420px,90vw);aspect-ratio:1.6/1;position:relative}
+#radio{
+    position:absolute;inset:0;
+    background:linear-gradient(180deg,#3a2b1d,#1d150e);
+    border-radius:18px;
+    box-shadow:0 20px 40px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.04);
+}
+.knob{
+    position:absolute;width:72px;height:72px;border-radius:50%;
+    background:radial-gradient(circle at 30%30%,#8a6a45,#241a10);
+    border:2px solid #1a120d;box-shadow:inset 0 3px 6px rgba(0,0,0,.5);
+    cursor:pointer;touch-action:none;
+}
+#tune{left:28%;top:30%}
+#vol{left:62%;top:30%}
+.knob::after{
+    content:"";position:absolute;inset:50% auto auto 50%;
+    width:4px;height:28px;background:#c9a06a;border-radius:2px;
+    transform-origin:50% bottom;transform:translate(-50%,-100%) rotate(0deg);
+}
+.knob.latched{outline:2px solid #ffb04a;outline-offset:4px}
+#screen{
+    position:absolute;left:50%;top:12%;transform:translateX(-50%);
+    width:70%;height:22%;background:#0b0a08;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;letter-spacing:.18em;color:#ffb04a;
+}
+</style>
+</head>
+<body>
+<div id="desk">
+    <div id="radio">
+        <div id="screen">88.7 MHz</div>
+        <div class="knob" id="tune" title="Tune"></div>
+        <div class="knob" id="vol"  title="Volume"></div>
+    </div>
+</div>
+<script>
+/* First principles latch-lock: no reticle, no virtual pointer, no glide */
+(function(){
+  const knobs = document.querySelectorAll('.knob');
+  let latched = null;
+  let lockX = 0, lockY = 0;
+
+  function hideCursor(){ document.documentElement.style.cursor = 'none'; }
+  function showCursor(){ document.documentElement.style.cursor = ''; }
+
+  function release(){
+    if(!latched) return;
+    latched.classList.remove('latched');
+    latched = null;
+    showCursor();
+  }
+
+  function latch(knob, e){
+    // record click position, hide cursor
+    lockX = e.clientX; lockY = e.clientY;
+    hideCursor();
+    latched = knob;
+    latched.classList.add('latched');
+  }
+
+  document.addEventListener('pointerdown', (e)=>{
+    const k = e.target.closest('.knob');
+    if(k){
+      e.preventDefault();
+      latch(k, e);
+    }else{
+      // click elsewhere → release
+      release();
+    }
+  });
+
+  document.addEventListener('pointermove', (e)=>{
+    if(!latched) return;
+    // Use movement since last pointer position to turn knob
+    // (Browser gives us movement, no need to teleport cursor)
+    const dx = e.movementX, dy = e.movementY;
+    const delta = -(dx + dy) * 0.02;
+    const marker = latched.querySelector(':after') || null;
+    // Simple visual feedback: rotate knob
+    const current = parseFloat(latched.dataset.rot || '0');
+    const next = current + delta;
+    latched.dataset.rot = next;
+    latched.style.transform = 'rotate(' + next + 'deg)';
+    
+    // Update screen for tune knob
+    if(latched.id === 'tune'){
+      const freq = 87.5 + (next % 360)/360 * 10;
+      document.getElementById('screen').textContent = freq.toFixed(1) + ' MHz';
+    }
+  });
+
+  window.addEventListener('blur', release);
+})();
+</script>
+</body>
+</html>

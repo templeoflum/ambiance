@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AMB · 02 — Radio studies</title>
+<style>
+  @import './core.css';
+  @import 'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Archivo+Narrow:wght@500;600&family=Newsreader:opsz@6..72&family=Helvetica+Neue:wght@400;500&display=swap';
+
+  /* study switcher / stage */
+  .stage{
+    position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+    background:radial-gradient(130% 120% at 50% 14%, #0d0b09, #050403 78%);
+    transition:opacity .6s var(--ease-critical);
+  }
+  .stage.hidden{opacity:0;pointer-events:none;}
+  .studyswitch{
+    position:fixed; top:16px; left:50%; transform:translateX(-50%); z-index:60;
+    display:flex; gap:14px; background:rgba(10,8,6,.6); padding:8px 14px; border-radius:30px;
+    border:1px solid #1c1814; backdrop-filter:blur(4px);
+  }
+  .studyswitch button{
+    background:none; border:none; color:var(--ink-dim); font-family:var(--f-mono); font-size:10px;
+    letter-spacing:.16em; text-transform:uppercase; cursor:pointer; padding:4px 8px; transition:.2s;
+  }
+  .studyswitch button:hover{color:var(--ink);}
+  .studyswitch button.on{color:var(--mat-acc);text-shadow:0 0 8px var(--mat-acc);}
+  .studyswitch button .id{display:block;font-size:8px;color:var(--ink-faint);}
+  p.note{font-family:var(--f-mono);font-size:10px;color:var(--ink-faint);}
+  .lodbar{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:60;
+     display:flex;align-items:center;gap:10px;}
+  .studyswitch .hint{color:var(--ink-faint);font-size:9px;}

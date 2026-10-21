@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AMB · 02 — radio knob lock</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:radial-gradient(120%120% at50%16%,#0a0806 0%,#050403 72%);
+  color:#e9e2d6;
+  font-family:system-ui,-apple-system,Segoe UI,Helvetica,Arial,sans-serif;
+  display:flex;align-items:center;justify-content:center;
+  user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
+}
+#desk{width:min(420px,90vw);aspect-ratio:1.6/1;position:relative}
+#radio{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,#3a2b1d,#1d150e);
+  border-radius:18px;
+  box-shadow:0 20px 40px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.04);
+}
+.knob{
+  position:absolute;width:72px;height:72px;border-radius:50%;
+  background:radial-gradient(circle at 30%30%,#8a6a45,#241a10);
+  border:2px solid #1a120d;box-shadow:inset 0 3px 6px rgba(0,0,0,.5);
+  cursor:pointer;touch-action:none;
+}
+#tune{left:28%;top:30%}
+#vol{left:62%;top:30%}
+.knob::after{
+  content:"";position:absolute;inset:50% auto auto 50%;
+  width:4px;height:28px;background:#c9a06a;border-radius:2px;
+  transform-origin:50% bottom;transform:translate(-50%,-100%) rotate(0deg);
+  pointer-events:none;
+}
+.knob.latched{outline:2px solid #ffb04a;outline-offset:4px}
+#screen{
+  position:absolute;left:50%;top:12%;transform:translateX(-50%);
+  width:70%;height:22%;background:#0b0a08;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;letter-spacing:.18em;color:#ffb04a;
+}
+body.kit-dragging,body.kit-dragging *{cursor:none !important}
+</style>
+</head>
+<body>
+<div id="desk">
+  <div id="radio">
+    <div id="screen">88.7 MHz</div>
+    <div class="knob" id="tune" title="Tune"></div>
+    <div class="knob" id="vol"  title="Volume"></div>
+  </div>
+</div>
+<script>
+(function(){
+  const knobs=document.querySelectorAll('.knob');
+  let latched=null, lockActive=false, startX=0, startRot=0;
+
+  function hideCursor(){ document.body.classList.add('kit-dragging'); }
+  function showCursor(){ document.body.classList.remove('kit-dragging'); }
+
+  function release(){
+    if(!latched) return;
+    latched.classList.remove('latched');
+    latched=null;
+    lockActive=false;
+    showCursor();
+    if(document.pointerLockElement){
+      document.exitPointerLock?.();
+    }
+  }
+
+  function latch(knob, e){
+    latched=knob;
+    latched.classList.add('latched');
+    hideCursor();
+    lockActive=true;
+    startX=e.clientX;
+    startRot=parseFloat(knob.dataset.rot||'0');
+    // lock pointer after a few px to avoid screen-edge stall; kit does pre-lock drag then requestPointerLock
+    requestAnimationFrame(()=>{ try{knob.requestPointerLock?.();}catch(e){} });
+  }
+
+  document.addEventListener('pointerdown',e=>{
+    const k=e.target.closest('.knob');
+    if(!k) { release(); return; }
+    e.preventDefault();
+    if(latched===k){ release(); return; }
+    latch(k,e);
+  });
+
+  let lastX=0;
+  document.addEventListener('pointermove',e=>{
+    if(!latched||!lockActive) return;
+    if(lastX===0) { lastX=e.clientX; return; }
+    const dx=e.clientX-lastX;
+    lastX=e.clientX;
+    const delta=dx*0.5; // tune knob sensitivity
+    const rot=startRot+delta;
+    latched.dataset.rot=rot;
+    latched.style.transform='rotate('+rot+'deg)';
+    if(latched.id==='tune'){
+      const freq=87.5+((rot%360)/360)*10;
+      document.getElementById('screen').textContent=freq.toFixed(1)+' MHz';
+    }
+  });
+
+  document.addEventListener('pointerup',release);
+  document.addEventListener('pointercancel',release);
+  document.addEventListener('pointerlockchange',()=>{ if(!document.pointerLockElement) { lockActive=false; } });
+})();
+</script>
+</body>
+</html>
