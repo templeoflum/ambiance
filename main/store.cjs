@@ -1,6 +1,6 @@
 // main/store.cjs
 // Load / save per-device state (position, size, channel, volume, muted, powered)
-// File: ~/work/ambiance/config/radio.json
+// File: ~/work/sound/ambiance/config/radio.json
 const fs = require('fs');
 const path = require('path');
 
